@@ -21,6 +21,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const LoginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email" }),
@@ -31,17 +33,25 @@ const LoginSchema = z.object({
 
 // Component
 export default function LoginForm() {
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     reValidateMode: "onBlur",
   });
 
-  const { mutate, isLoading, isError, data, isSuccess } = useMutation({
+  const { toast } = useToast()
+
+  const { mutate, isSuccess, isLoading } = useMutation({
     mutationKey: ["auth"],
     mutationFn: async (data: z.infer<typeof LoginSchema>) => {
       let res = await axios.post("/api/auth/signup", data);
       return res.data;
     },
+    onError: (err) => toast({
+      variant: "destructive",
+      title: "Error occured",
+
+    })
   });
   function onSubmit(data: z.infer<typeof LoginSchema>) {
     mutate(data);
@@ -91,9 +101,11 @@ export default function LoginForm() {
           <Button
             type="submit"
             className="w-full"
-            disabled={!form.formState.isValid}
+            disabled={!form.formState.isValid || isLoading}
           >
-            Submit
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> :
+
+              "Submit"}
           </Button>
         </form>
       </Form>

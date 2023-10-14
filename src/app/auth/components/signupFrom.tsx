@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-
+import { toast, useToast } from "@/components/ui/use-toast";
 const NewAccountSchema = z
   .object({
     username: z.string().min(1),
@@ -50,11 +50,18 @@ export default function CreateAccountForm() {
     reValidateMode: "onBlur",
   });
 
+  const { toast } = useToast()
+
   const mutation = useMutation({
     mutationFn: (data: UserData) => {
       const { username, email, password } = data;
       return axios.put("/api/user", { email, password, username });
     },
+    onError: (err) => toast({
+      variant: "destructive",
+      title: "Error occured",
+
+    })
   });
 
   function onSubmit(data: z.infer<typeof NewAccountSchema>) {
@@ -62,15 +69,6 @@ export default function CreateAccountForm() {
     mutation.mutate({ email, password, username });
   }
 
-  // async function createUser(email: string, password: string, username: string) {
-  //   try {
-  //     const res = await ;
-  //     return res.data;
-  //   } catch (err) {
-  //     console.log(err);
-  //     throw Error("Could not Create User");
-  //   }
-  // }
 
   return (
     <Card className="w-auto p-3">
@@ -143,7 +141,7 @@ export default function CreateAccountForm() {
           <Button
             type="submit"
             className="w-full"
-            disabled={!form.formState.isValid}
+            disabled={!form.formState.isValid || mutation.isLoading}
           >
             {mutation.isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
