@@ -33,6 +33,7 @@
     "jotai": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.279.0",
+    "mongoose": "^7.6.2",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
