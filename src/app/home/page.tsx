@@ -29,7 +29,7 @@ export default function HomePage() {
                 key={i}
                 discription={data.discription}
                 id={data._id}
-                isPublic={true}
+                isPublic={data.isPublic}
                 title={data.title}
                 createdAt='12345'
               />
