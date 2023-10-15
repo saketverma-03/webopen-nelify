@@ -4,7 +4,7 @@ import { html } from "@codemirror/lang-html";
 import { javascript } from "@codemirror/lang-javascript";
 import CodeMirror from "@uiw/react-codemirror";
 
-import { cssCode, htmlCode, jsCode, editorFontSize } from "@/store";
+import { cssCode, editorFontSize, htmlCode, jsCode } from "@/store";
 import { useAtom } from "jotai";
 
 export function JsPannel() {
@@ -19,6 +19,7 @@ export function JsPannel() {
       extensions={[javascript()]}
       className="editor-view"
       onChange={(value) => setCode(value)}
+      // @ts-ignore
       style={style}
     />
   );
@@ -35,6 +36,7 @@ export function HtmlPannel() {
       extensions={[html()]}
       className="editor-view"
       onChange={(value) => setCode(value)}
+      // @ts-ignore
       style={style}
     />
   );
@@ -51,6 +53,7 @@ export function CssPannel() {
       extensions={[css()]}
       className="editor-view"
       onChange={(value) => setCode(value)}
+      // @ts-ignore
       style={style}
     />
   );

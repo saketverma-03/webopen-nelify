@@ -1,56 +1,37 @@
-"use client"
-import { CssPannel, HtmlPannel, JsPannel } from "@/components/EditorPannel"
-import { cn } from "@/lib/utils"
-import { cssCode, htmlCode, jsCode, projUserType } from "@/store"
-import { useAtom } from "jotai"
-import { useCallback, useEffect, useRef, useState } from "react"
-import "./../styles.scss"
-import { EditorNavbar } from "@/components/navbar/EditorNavbar"
-import { useParams } from "next/navigation"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import axios from "axios"
+"use client";
+import { CssPannel, HtmlPannel, JsPannel } from "@/components/EditorPannel";
+import { EditorNavbar } from "@/components/navbar/EditorNavbar";
+import { cn } from "@/lib/utils";
+import { cssCode, htmlCode, jsCode, projUserType } from "@/store";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useAtom } from "jotai";
+import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "./../styles.scss";
 
 const Lol = ({ currentView }: { currentView: string }) => {
-  if (currentView === "js") return <JsPannel />
-  if (currentView === "css") return <CssPannel />
-  return <HtmlPannel />
-}
-
-const UseSrc = () => {
-  const [src, setSrc] = useState("")
-  const [html] = useAtom(htmlCode)
-  const [css] = useAtom(cssCode)
-  const [js] = useAtom(jsCode)
-
-  useEffect(() => {
-    setSrc(`
-          <html>
-          <body>${html}</body>
-          <style>${css}</style>
-          <script>${js}</script>
-          </html>
-      `)
-  }, [html, css, js])
-
-  return [src]
-}
+  if (currentView === "js") return <JsPannel />;
+  if (currentView === "css") return <CssPannel />;
+  return <HtmlPannel />;
+};
 
 const EditorPage = () => {
-  const handleRef = useRef(null)
-  const editorRef = useRef(null)
+  const handleRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
-  const [windowWidth, setWindowWidth] = useState({ "--width": "200px" })
-  const [hidden, setHidden] = useState(false)
-  const [currentView, setCurrentView] = useState("html")
-  const [full, setFull] = useState(false)
+  const [windowWidth, setWindowWidth] = useState({ "--width": "200px" });
+  const [hidden, setHidden] = useState(false);
+  const [currentView, setCurrentView] = useState("html");
+  const [full, setFull] = useState(false);
   const [fontSize, setFontSize] = useState({
     "--e-font-size": "calc(1rem + 0px )",
-  })
-  const [src, setSrc] = useState("")
-  const [html, setHtml] = useAtom(htmlCode)
-  const [css, setCss] = useAtom(cssCode)
-  const [js, setJs] = useAtom(jsCode)
-  const [, setUserType] = useAtom(projUserType)
+  });
+  const [src, setSrc] = useState("");
+  const [html, setHtml] = useAtom(htmlCode);
+  const [css, setCss] = useAtom(cssCode);
+  const [js, setJs] = useAtom(jsCode);
+  const [, setUserType] = useAtom(projUserType);
 
   useEffect(() => {
     setSrc(`
@@ -59,70 +40,71 @@ const EditorPage = () => {
           <style>${css}</style>
           <script>${js}</script>
           </html>
-      `)
-  }, [html, css, js])
+      `);
+  }, [html, css, js]);
 
-  const { id } = useParams()
+  const { id } = useParams();
 
   const query = useQuery({
     queryKey: ["editorData"],
     queryFn: async () => {
-      const res = await axios.get(`/api/project/${id}`)
-      return res?.data
+      const res = await axios.get(`/api/project/${id}`);
+      return res?.data;
     },
     onSuccess: (data) => {
-      const { htmlCode, cssCode, jsCode } = data.project
-      setHtml(htmlCode)
-      setCss(cssCode)
-      setJs(jsCode)
-      console.log(data)
-      setUserType(data.usertype)
+      const { htmlCode, cssCode, jsCode } = data.project;
+      setHtml(htmlCode);
+      setCss(cssCode);
+      setJs(jsCode);
+      console.log(data);
+      setUserType(data.usertype);
     },
-  })
+  });
 
-
-
-  useEffect(() => console.log(id), [])
   const handleWindowMouseMove = useCallback((event: any) => {
     /* Calculate new width */
-    let newWid =
-      editorRef.current?.offsetWidth +
-      (event.clientX - handleRef.current?.offsetLeft)
+    if (!editorRef.current) throw Error("Regrence Error for resizing");
+    if (!handleRef.current) throw Error("Refrence error resingn");
 
-    setWindowWidth({ "--width": `${newWid}px` })
-    newWid = null
-  }, [])
+    let newWid =
+      editorRef.current.offsetWidth +
+      (event.clientX - handleRef.current?.offsetLeft);
+
+    setWindowWidth({ "--width": `${newWid}px` });
+    // newWid = null;
+  }, []);
 
   const hadnleMouseDown = () => {
-    setHidden(true)
-    window.addEventListener("mousemove", handleWindowMouseMove)
-  }
+    setHidden(true);
+    window.addEventListener("mousemove", handleWindowMouseMove);
+  };
 
   function hadnleMouseUp() {
-    setHidden(false)
-    window.removeEventListener("mousemove", handleWindowMouseMove)
+    setHidden(false);
+    window.removeEventListener("mousemove", handleWindowMouseMove);
   }
 
   return (
     <>
       <EditorNavbar projId={id as string} />
-      <div className='editor-container'>
+      <div className="editor-container">
         {/* Pannel 1 */}
         <div
           ref={editorRef}
+          // @ts-ignore
           style={windowWidth}
           onMouseUp={hadnleMouseUp}
-          className='editorpan'
+          className="editorpan"
         >
           {/* Tabs */}
-          <ul className='list-none flex cursor-pointer justify-between bg-gray-800 text-gray-300 font-bold'>
+          <ul className="list-none flex cursor-pointer justify-between bg-gray-800 text-gray-300 font-bold">
             <li
               // className={`${currentView === "html" ? "selected" : ""}`}
               className={cn(
                 "flex-1 text-center py-2 b border border-gray-500",
                 {
                   "border-gray-100": currentView === "html",
-                },
+                }
               )}
               onClick={() => setCurrentView("html")}
             >
@@ -133,7 +115,7 @@ const EditorPage = () => {
                 "flex-1 text-center py-2 b border border-gray-500",
                 {
                   "border-gray-100": currentView === "css",
-                },
+                }
               )}
               onClick={() => setCurrentView("css")}
             >
@@ -144,7 +126,7 @@ const EditorPage = () => {
                 "flex-1 text-center py-2 b border border-gray-500",
                 {
                   "border-gray-100": currentView === "js",
-                },
+                }
               )}
               onClick={() => setCurrentView("js")}
             >
@@ -162,7 +144,7 @@ const EditorPage = () => {
         {/* divider between pannels */}
         <div
           ref={handleRef}
-          className='handle'
+          className="handle"
           onMouseDown={hadnleMouseDown}
           onMouseUp={hadnleMouseUp}
         ></div>
@@ -175,12 +157,12 @@ const EditorPage = () => {
           <iframe
             className={hidden ? "hide" : ""}
             srcDoc={src}
-            frameBorder='0'
+            frameBorder="0"
           ></iframe>
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default EditorPage
+export default EditorPage;

@@ -1,11 +1,11 @@
 "use client";
 import { CssPannel, HtmlPannel, JsPannel } from "@/components/EditorPannel";
+import { EditorNavbar } from "@/components/navbar/EditorNavbar";
 import { cn } from "@/lib/utils";
 import { cssCode, htmlCode, jsCode } from "@/store";
 import { useAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 import "./styles.scss";
-import { EditorNavbar } from "@/components/navbar/EditorNavbar";
 
 const Lol = ({ currentView }: { currentView: string }) => {
   if (currentView === "js") return <JsPannel />;
@@ -13,28 +13,9 @@ const Lol = ({ currentView }: { currentView: string }) => {
   return <HtmlPannel />;
 };
 
-const UseSrc = () => {
-  const [src, setSrc] = useState("");
-  const [html] = useAtom(htmlCode);
-  const [css] = useAtom(cssCode);
-  const [js] = useAtom(jsCode);
-
-  useEffect(() => {
-    setSrc(`
-          <html>
-          <body>${html}</body>
-          <style>${css}</style>
-          <script>${js}</script>
-          </html>
-      `);
-  }, [html, css, js]);
-
-  return [src];
-};
-
 const EditorPage = () => {
-  const handleRef = useRef(null);
-  const editorRef = useRef(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   const [windowWidth, setWindowWidth] = useState({ "--width": "200px" });
   const [hidden, setHidden] = useState(false);
@@ -60,12 +41,15 @@ const EditorPage = () => {
 
   const handleWindowMouseMove = useCallback((event: any) => {
     /* Calculate new width */
+    if (!editorRef.current) throw Error("Regrence Error for resizing");
+    if (!handleRef.current) throw Error("Refrence error resingn");
+
     let newWid =
       editorRef.current.offsetWidth +
-      (event.clientX - handleRef.current.offsetLeft);
+      (event.clientX - handleRef.current?.offsetLeft);
 
     setWindowWidth({ "--width": `${newWid}px` });
-    newWid = null;
+    // newWid = null;
   }, []);
 
   const hadnleMouseDown = () => {
@@ -106,11 +90,12 @@ const EditorPage = () => {
 
   return (
     <>
-      <EditorNavbar />
+      <EditorNavbar projId="0000" />
       <div className="editor-container">
         {/* Pannel 1 */}
         <div
           ref={editorRef}
+          // @ts-ignore
           style={windowWidth}
           onMouseUp={hadnleMouseUp}
           className="editorpan"
@@ -119,25 +104,34 @@ const EditorPage = () => {
           <ul className="list-none flex cursor-pointer justify-between bg-gray-800 text-gray-300 font-bold">
             <li
               // className={`${currentView === "html" ? "selected" : ""}`}
-              className={cn("flex-1 text-center py-2 b border border-gray-500", {
-                "border-gray-100": currentView === "html",
-              })}
+              className={cn(
+                "flex-1 text-center py-2 b border border-gray-500",
+                {
+                  "border-gray-100": currentView === "html",
+                }
+              )}
               onClick={() => setCurrentView("html")}
             >
               html
             </li>
             <li
-              className={cn("flex-1 text-center py-2 b border border-gray-500", {
-                "border-gray-100": currentView === "css",
-              })}
+              className={cn(
+                "flex-1 text-center py-2 b border border-gray-500",
+                {
+                  "border-gray-100": currentView === "css",
+                }
+              )}
               onClick={() => setCurrentView("css")}
             >
               css
             </li>
             <li
-              className={cn("flex-1 text-center py-2 b border border-gray-500", {
-                "border-gray-100": currentView === "js",
-              })}
+              className={cn(
+                "flex-1 text-center py-2 b border border-gray-500",
+                {
+                  "border-gray-100": currentView === "js",
+                }
+              )}
               onClick={() => setCurrentView("js")}
             >
               js
