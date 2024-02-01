@@ -66,8 +66,8 @@ export default function CreateCard() {
     <>
       <Dialog>
         <DialogTrigger>
-          <Card className="p-8 w-fit hover:shadow-[rgba(7,_65,_210,_0.1)_0px_9px_30px]">
-            <CardTitle className="text-gray-800">Create New</CardTitle>
+          <Card className="p-8 w-fit hover:bg-primary hover:text-black">
+            <CardTitle>Create New</CardTitle>
           </Card>
         </DialogTrigger>
         <DialogContent>
